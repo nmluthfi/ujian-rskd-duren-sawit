@@ -8,6 +8,15 @@ class Polyclinic extends Model
 {
     // Mendefinisikan kolom mana saja yang boleh diisi
     protected $fillable = [
-        'polyclinic_nname',
+        'name',
     ];
+
+    /*
+     * Definisi relasi one-to-many pada model Polyclinic.
+     * satu poliklinik bisa punya banyak registrasi (kunjungan pasien)
+     */
+    public function registrations()
+    {
+        return $this->hasMany(Registration::class);
+    }
 }

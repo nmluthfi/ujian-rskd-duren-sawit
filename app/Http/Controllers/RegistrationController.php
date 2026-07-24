@@ -132,4 +132,17 @@ class RegistrationController extends Controller
 
         return view('registrations.registration-history', ['registrations' => $registrations]);
     }
+
+    /**
+     * Endpoint khusus fitur "Ekspor Rekap Kunjungan" - rekap jumlah pasien per poliklinik,
+     * diurutkan dari yang terbanyak ke tersedikit.
+     */
+    public function rekapKunjungan()
+    {
+        $polyclinics = Polyclinic::withCount('registrations')
+            ->orderByDesc('registrations_count')
+            ->get();
+
+        return view('registrations.rekap-kunjungan', ['polyclinics' => $polyclinics]);
+    }
 }

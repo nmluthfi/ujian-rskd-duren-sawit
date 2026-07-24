@@ -181,6 +181,7 @@
             {{-- Tombol daftar disabled kalau belum ada pasien valid ditemukan --}}
             <button type="submit" @if (!$patient) disabled @endif>Daftarkan</button>
             <button type="button" id="history-button">Tampilkan Riwayat Registrasi</button>
+            <button type="button" id="rekap-kunjungan-button">Ekspor Rekap Kunjungan</button>
         </form>
         {{-- Container kosong, diisi HTML langsung dari server lewat fetch() --}}
         <div id="history-container"></div>
@@ -189,6 +190,15 @@
             document.getElementById('history-button')?.addEventListener('click', function () {
                 // Gak perlu medicalNumber lagi - endpoint ini balikin SEMUA data registrasi
                 fetch(`/registrations/registration-history`)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('history-container').innerHTML = html;
+                    });
+            });
+
+            document.getElementById('rekap-kunjungan-button')?.addEventListener('click', function () {
+                // Rekap jumlah pasien per poliklinik, sudah diurutkan terbanyak ke tersedikit dari server
+                fetch(`/registrations/rekap-kunjungan`)
                     .then(response => response.text())
                     .then(html => {
                         document.getElementById('history-container').innerHTML = html;

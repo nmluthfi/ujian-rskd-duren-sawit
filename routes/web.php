@@ -12,4 +12,7 @@ Route::post('registrations', [RegistrationController::class, 'store'])->name('re
 // Menampilakn riwayat history seluruh pasien yang sudah terdaftar di semua poliklinik
 Route::get('/registrations/registration-history', [RegistrationController::class, 'registrationHistory'])->name('registrations.registration-history');
 
+// Menampilkan rekap jumlah pasien per poliklinik, diurutkan dari terbanyak ke tersedikit
+Route::get('/registrations/rekap-kunjungan', [RegistrationController::class, 'rekapKunjungan'])->name('registrations.rekap-kunjungan');
+
 
