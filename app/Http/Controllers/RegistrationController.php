@@ -89,6 +89,9 @@ class RegistrationController extends Controller
             'date_to' => 'nullable|date',
         ]);
 
+        // Data pasien yang dicari, ditampilkan terpisah dari riwayat pendaftarannya
+        $patient = Patient::findOrFail($validated['patient_medical_number']);
+
         // Mulai query dasar: filter by patient_medical_number (wajib)
         $query = Registration::where('patient_medical_number', $validated['patient_medical_number'])
             ->with('polyclinic'); // eager load supaya nama poliklinik ikut ke-load
@@ -105,7 +108,16 @@ class RegistrationController extends Controller
         // Memfilter result API berdasarkan urutan ID registrasi secara low-to-high
         $registrations = $query->orderBy('id', 'asc')->get();
 
-        return RegistrationResource::collection($registrations);
+        return response()->json([
+            'data_pasien' => [
+                'medical_number' => $patient->medical_number,
+                'name' => $patient->name,
+                'birth_of_date' => $patient->birth_of_date->format('Y-m-d'),
+                'sex' => $patient->sex,
+                'address' => $patient->address,
+            ],
+            'riwayat_pendaftaran' => RegistrationResource::collection($registrations),
+        ]);
     }
 
     /**
