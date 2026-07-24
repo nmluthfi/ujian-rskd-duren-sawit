@@ -32,7 +32,7 @@ Ada 3 tabel utama:
 
 Sebelum menjalankan aplikasi ini di komputer lain, pastikan sudah terinstall:
 
-1. **PHP 8.2 atau lebih baru** beserta extension `sqlsrv` dan `pdo_sqlsrv` (dibutuhkan supaya PHP bisa "ngobrol" dengan database SQL Server)
+1. **PHP 8.3 atau lebih baru** beserta extension `sqlsrv` dan `pdo_sqlsrv` (dibutuhkan supaya PHP bisa "ngobrol" dengan database SQL Server)
 2. **Composer** (package manager PHP)
 3. **Docker Desktop** (buat menjalankan database SQL Server secara lokal)
 4. **Microsoft ODBC Driver 18 for SQL Server** (jembatan teknis antara PHP dan SQL Server)
@@ -48,7 +48,7 @@ docker start sqlserver-ujian-rskd-duren-sawit
 Kalau container-nya belum pernah dibuat sama sekali, gunakan (hanya sekali saja):
 
 ```bash
-docker run --platform linux/amd64 -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=<password_pilihanmu>" -p 1433:1433 --name sqlserver-latihan-ujian-rskd-duren-sawit -d mcr.microsoft.com/mssql/server:2022-latest
+docker run --platform linux/amd64 -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=<password_pilihanmu>" -p 1434:1433 --name sqlserver-ujian-rskd-duren-sawit -d mcr.microsoft.com/mssql/server:2022-latest
 ```
 
 ### 2. Install dependency PHP
@@ -64,7 +64,7 @@ Salin `.env.example` menjadi `.env`, lalu sesuaikan bagian koneksi database:
 ```env
 DB_CONNECTION=sqlsrv
 DB_HOST=127.0.0.1
-DB_PORT=1433
+DB_PORT=1434
 DB_DATABASE=rskd_duren_sawit
 DB_USERNAME=sa
 DB_PASSWORD=<password_sesuai_container_docker>
@@ -88,50 +88,57 @@ Buka browser ke: **http://127.0.0.1:8000/registrations**
 ## Cara Pakai (dari sisi pengguna/admin)
 
 1. Buka halaman `http://127.0.0.1:8000/registrations`.
-2. Masukkan No. RM pasien di kolom pencarian (contoh data yang sudah tersedia: `1001`, `1002`, `1003`), klik **Cari**.
+2. Masukkan No. RM pasien di kolom pencarian (contoh data yang sudah tersedia: `05358`, `05456`, `05135`, `05268`), klik **Cari**.
 3. Kalau data pasien muncul, pilih poliklinik tujuan dari dropdown, lalu klik **Daftarkan**.
 4. Muncul pesan konfirmasi kalau pendaftaran berhasil disimpan.
 
 ## Dokumentasi API
 
-### Ambil riwayat pendaftaran seorang pasien
+### Ambil data pasien + riwayat pendaftarannya
 
 ```
-GET /api/history/registrations
+GET /api/registrations
 ```
 
 **Parameter (dikirim lewat query string di URL):**
 
 | Nama | Wajib? | Keterangan |
 |---|---|---|
-| `patient_medical_number` | Ya | No. RM pasien yang mau dicek riwayatnya |
-| `date_from` | Tidak | Cuma tampilkan pendaftaran mulai dari tanggal ini (format: `YYYY-MM-DD`) |
-| `date_to` | Tidak | Cuma tampilkan pendaftaran sampai tanggal ini (format: `YYYY-MM-DD`) |
+| `patient_medical_number` | Ya | No. RM pasien yang mau dicek datanya |
+| `date_from` | Tidak | Cuma tampilkan riwayat pendaftaran mulai dari tanggal ini (format: `YYYY-MM-DD`) |
+| `date_to` | Tidak | Cuma tampilkan riwayat pendaftaran sampai tanggal ini (format: `YYYY-MM-DD`) |
 
 **Contoh pemanggilan:**
 
 ```
-GET /api/history/registrations?patient_medical_number=1001
-GET /api/history/registrations?patient_medical_number=1001&date_from=2026-07-21&date_to=2026-07-23
+GET /api/registrations?patient_medical_number=05358
+GET /api/registrations?patient_medical_number=05358&date_from=2026-07-21&date_to=2026-07-23
 ```
 
 **Contoh response (format JSON):**
 
 ```json
 {
-  "data": [
+  "data_pasien": {
+    "medical_number": "05358",
+    "name": "Samsuri",
+    "birth_of_date": "1980-11-22",
+    "sex": "L",
+    "address": "Jln Raya Bekasi No.32, Bekasi"
+  },
+  "riwayat_pendaftaran": [
     {
       "id": 1,
-      "patient_medical_number": 1001,
       "polyclinic_name": "Poliklinik Mata",
-      "registration_date": "2026-07-20 09:30:00",
-      "status": "waiting"
+      "registration_date": "2026-05-03 15:03:00"
     }
   ]
 }
 ```
 
-**Catatan tentang waktu**: seluruh waktu **tersimpan di database dalam UTC**, tapi otomatis dikonversi ke **waktu Indonesia Barat (WIB / UTC+7)** sebelum ditampilkan di response ini — jadi jam yang kamu lihat di atas sudah waktu lokal Indonesia, tidak perlu dihitung ulang.
+**Kalau `patient_medical_number` kosong atau No. RM-nya nggak ditemukan**, response-nya `422 Unprocessable Content` dengan pesan error validasi, bukan `data_pasien`/`riwayat_pendaftaran`.
+
+**Catatan tentang waktu**: seluruh waktu **tersimpan di database dalam UTC**, tapi otomatis dikonversi ke **waktu Indonesia Barat (WIB / UTC+7)** sebelum ditampilkan di `registration_date` pada response ini — jadi jam yang kamu lihat di atas sudah waktu lokal Indonesia, tidak perlu dihitung ulang.
 
 ## Catatan Teknis Tambahan
 
