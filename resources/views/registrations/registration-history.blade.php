@@ -19,7 +19,7 @@
                     <td style="border: 1px solid #ccc; padding: 6px;">{{ $registration->id }}</td>
                     <td style="border: 1px solid #ccc; padding: 6px;">{{ $registration->patient_medical_number }}</td>
                     <td style="border: 1px solid #ccc; padding: 6px;">
-                        {{ $registration->patient->sex === 'L' ? 'Bp.' : 'Ny.' }} {{ $registration->patient->name }}
+                        {{ trim($registration->patient->sex) == 'L' ? 'Bp.' : 'Ny.' }} {{ $registration->patient->name }}
                     </td>
                     <td style="border: 1px solid #ccc; padding: 6px;">
                         {{ $registration->patient->birth_of_date->format('d-m-Y') }}

@@ -127,7 +127,7 @@ class RegistrationController extends Controller
     public function registrationHistory()
     {
         $registrations = Registration::with(['polyclinic', 'patient'])
-            ->orderBy('registration_date', 'asc')
+            ->orderBy('id', 'asc')
             ->get();
 
         return view('registrations.registration-history', ['registrations' => $registrations]);

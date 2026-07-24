@@ -42,7 +42,7 @@ Sebelum menjalankan aplikasi ini di komputer lain, pastikan sudah terinstall:
 ### 1. Jalankan database (SQL Server via Docker)
 
 ```bash
-docker start sqlserver-latihan-ujian-rskd-duren-sawit
+docker start sqlserver-ujian-rskd-duren-sawit
 ```
 
 Kalau container-nya belum pernah dibuat sama sekali, gunakan (hanya sekali saja):
